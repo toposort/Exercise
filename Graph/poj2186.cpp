@@ -85,8 +85,7 @@ int main(){
                 }
             }
         }
-        int sum = 0;
-        int loc = 0;
+        int sum = 0, loc = 0;
         for(int i = 1; i <= scc_cnt; i++){
             if(!out[i]){
                 sum++;
