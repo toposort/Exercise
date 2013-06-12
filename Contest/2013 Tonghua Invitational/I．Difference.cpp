@@ -23,10 +23,11 @@ struct node{
     int next;
 }edge[maxm];
 int head[maxn], color[maxn], dfn[maxn], low[maxn], sccno[maxn];
-int n, cnt, dfs_clock, scc_cnt, numm, ss;
+int ss, n, cnt, dfs_clock, scc_cnt, numm;
 std::stack<int>st;
 
 void init(){
+    ss = 0;
     cnt = 0;
     numm = 0;
     scc_cnt = 0;
@@ -106,8 +107,8 @@ int main(){
             if(!dfn[i]) dfs(i);
         }
         if(numm<=1){
-            color[0] = 1;
-            if(check(0)){
+            color[ss] = 1;
+            if(check(ss)){
                 puts("Yes");
                 continue;
             }
