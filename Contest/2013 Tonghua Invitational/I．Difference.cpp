@@ -23,7 +23,7 @@ struct node{
     int next;
 }edge[maxm];
 int head[maxn], color[maxn], dfn[maxn], low[maxn], sccno[maxn];
-int n, cnt, dfs_clock, scc_cnt, numm;
+int n, cnt, dfs_clock, scc_cnt, numm, ss;
 std::stack<int>st;
 
 void init(){
@@ -82,7 +82,10 @@ void dfs(int u){
             ++tot;
             if(x==u) break;
         }
-        if(tot>1) ++numm;
+        if(tot>1){
+            ss = u;
+            ++numm;
+        }
     }
 }
 
