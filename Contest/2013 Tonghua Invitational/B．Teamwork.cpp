@@ -31,6 +31,7 @@ struct point{
 }p[maxn];
 int n, m, cnt;
 int head[maxn], b[maxn], e[maxn], map[maxn][6];
+int cur[maxn], pre[maxn], dis[maxn], gap[maxn], aug[maxn];
 
 void init(int n){
     cnt = 0;
@@ -56,47 +57,57 @@ void add(int u, int v, int w){
     head[v] = cnt++;
 }
 
-int sap(int S, int T, int N){
-    int maxflow = 0;
-    int pre[maxn], dis[maxn] = {}, gap[maxn] = {}, cur[maxn];
-    std::copy(head, head+N, cur);
-    gap[0] = N+1;
-    ++gap[dis[S]=1];
-    for(int u = pre[S]=S; dis[S] <= N; ++gap[++dis[u]],u=pre[u]){
-        for(bool flag = true; flag; ){
-            flag = false;
-            for(int &p = cur[u]; ~p; p = edge[p].next){
-                if(!edge[p].w || dis[u]!=dis[edge[p].v]+1) continue;
+int sap(int s, int e, int n){
+    int max_flow = 0, u = s;
+    int mindis;
+    for(int i = 0; i <= n; i++){
+        cur[i] = head[i];
+        dis[i] = 0;
+        gap[i] = 0;
+    }
+    aug[s] = oo;
+    pre[s] = -1;
+    gap[0] = n;
+    while(dis[s]<n){
+        bool flag = false;
+        if(u==e){
+            max_flow += aug[e];
+            for(int v = pre[e]; v != -1; v = pre[v]){
+                int id = cur[v];
+                edge[id].w -= aug[e];
+                edge[id^1].w += aug[e];
+                aug[v] -= aug[e];
+                if(edge[id].w==0) u = v;
+            }
+        }
+        for(int id = cur[u]; id != -1; id = edge[id].next){
+            int v = edge[id].v;
+            if(edge[id].w>0 && dis[u]==dis[v]+1){
                 flag = true;
-                pre[edge[p].v] = u;
-                u = edge[p].v;
-                if(u==T){
-                    int aug = oo;
-                    for(int i = S; i != T; i = edge[cur[i]].v){
-                        if(aug > edge[cur[i]].w){
-                            u = i;
-                            aug = edge[cur[i]].w;
-                        }
-                    }
-                    for(int i = S; i != T; i = edge[cur[i]].v){
-                        edge[cur[i]].w -= aug;
-                        edge[cur[i]^1].w += aug;
-                    }
-                    maxflow += aug;
-                }
+                pre[v] = u;
+                cur[u] = id;
+                aug[v] = std::min(aug[u], edge[id].w);
+                u = v;
                 break;
             }
         }
-        if(--gap[dis[u]]==0) break;
-        dis[u] = N;
-        for(int i = head[u]; ~i; i = edge[i].next){
-            if(edge[i].w && dis[u] > dis[edge[i].v]){
-                dis[u] = dis[edge[i].v];
-                cur[u] = i;
+        if(flag==false){
+            if(--gap[dis[u]]==0) break;
+            mindis = n;
+            cur[u] = head[u];
+            for(int id = head[u]; id != -1; id = edge[id].next){
+                int v = edge[id].v;
+                if(edge[id].w>0 && dis[v]<mindis){
+                    mindis = dis[v];
+                    cur[u] = id;
+                }
             }
+            dis[u] = mindis+1;
+            ++gap[dis[u]];
+            if(u!=s) u = pre[u];
         }
     }
-    return maxflow;
+    return max_flow;
 }
 
 int main(){
