@@ -88,9 +88,9 @@ int main(){
     int t, k = 0;
     scanf("%d", &t);
     while(t--){
+        ++k;
         scanf("%d %d", &n, &m);
         init();
-        ++k;
         for(int i = 0; i < m; i++){
             int u, v;
             scanf("%d %d", &u, &v);
