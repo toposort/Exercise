@@ -1,7 +1,7 @@
 /**********************************
 dp[i]表示0-i这段区间可能变成的不同句子数，
 dp[i+1]+=dp[i]，如向后连续4个字符是hehe，
-那么dp[i+4]+=dp[i]，最后的答案就是dp[len].
+那么dp[i+4]+=dp[i]，最后的答案就是dp[len]了
 ***********************************/
 
 #include <stdio.h>
@@ -22,15 +22,16 @@ int main(){
         std::cin>>s;
         memset(dp, 0, sizeof(dp));
         dp[0] = 1;
-        for(int i = 0; i < (int)s.size(); i++){
+        int len = s.size();
+        for(int i = 0; i < len; i++){
+            dp[i] %= mod;
             dp[i+1] += dp[i];
-            dp[i+1] %= mod;
-            if(s[i+1]=='h' && s[i+2]=='e' && s[i+3]=='h' && s[i+4]=='e'){
+            if(s[i]=='h' && s[i+1]=='e' && s[i+2]=='h' && s[i+3]=='e'){
                 dp[i+4] += dp[i];
-                dp[i+4] %= mod;
             }
         }
-        printf("Case %d: %d\n", k, dp[s.size()]%mod);
+        printf("Case %d: %d\n", k, dp[len]%mod);
     }
     return 0;
 }
+
