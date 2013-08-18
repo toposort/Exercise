@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <queue>
 #include <stack>
 #include <string.h>
 
@@ -14,12 +13,12 @@ const int maxm = 150000<<1;
 struct node{
     int u;
     int v;
-    bool vis;
     int next;
 }edge[maxm], edge1[maxm];
 int n, m, cnt, dfs_clock, bcc_cnt;
 int head[maxn], head1[maxn], d[maxn], p[maxn][21];
 int dfn[maxn], low[maxn], bccno[maxn];
+bool vis[maxn];
 std::stack<int>st;
 
 void init(){
@@ -34,36 +33,38 @@ void init(){
         dfn[i] = 0;
         bccno[i] = 0;
         d[i] = 0;
+        vis[i] = false;
     }
 }
 
 void add(int u, int v, int head[], struct node edge[]){
     edge[cnt].u = u;
     edge[cnt].v = v;
-    edge[cnt].vis = false;
     edge[cnt].next = head[u];
     head[u] = cnt++;
 }
 
-void tarjan(int u){
+void tarjan(int u, int fa){
     dfn[u] = low[u] = ++dfs_clock;
     st.push(u);
+    vis[u] = true;
     for(int i = head[u]; i != -1; i = edge[i].next){
-        if(edge[i].vis) continue;
-        edge[i].vis = edge[i^1].vis = 1;
         int v = edge[i].v;
+        if(v==fa) continue;
         if(!dfn[v]){
-            tarjan(v);
+            tarjan(v, u);
             low[u] = std::min(low[u], low[v]);
         }
-        else if(!bccno[v]) low[u] = std::min(low[u], dfn[v]);
+        else{
+            if(vis[v]) low[u] = std::min(low[u], dfn[v]);
+        }
     }
-    if(low[u]==dfn[u]){
+    if(dfn[u]==low[u]){
         ++bcc_cnt;
         while(1){
             int v = st.top();
             st.pop();
-            bccno[v]=bcc_cnt;
+            bccno[v] = bcc_cnt;
             if(u==v) break;
         }
     }
@@ -131,7 +132,7 @@ int main(){
             add(v, u, head, edge);
         }
         for(int i = 1; i <= n; i++){
-            if(!dfn[i]) tarjan(i);
+            if(!dfn[i]) tarjan(i, -1);
         }
         cnt = 0;
         for(int u = 1; u <= n; u++){
